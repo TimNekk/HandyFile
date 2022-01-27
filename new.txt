@@ -1,0 +1,27 @@
+import subprocess
+import re
+import sys
+
+
+def sshRemoteCmd(user, host, cmd, port):
+    x = subprocess.Popen("ssh {user}@{host} {cmd}".format(user=user, host=host, cmd=cmd)).communicate()
+    result=''
+
+    if port is True:
+        x.append(port)
+
+    if not x:
+        result = 'error'
+    else:
+        for item in x:
+            result += item.decode('utf-8')
+    return result
+
+cmd = f'''"cqlsh localhost 9042 -e \\"select * from MYTABLE where userid='1234';\\""'''
+print(cmd)
+result = sshRemoteCmd('root','hosts', cmd)
+print(result)
+
+for info in result:
+    data = info.get_data()
+    await data.send()
